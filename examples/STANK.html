@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>STANK // Cloudroom Mockup (static)</title>
+
+  <!-- xterm -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.0.1/css/xterm.min.css" />
+  <style>
+    :root{
+      --bg:#0f0f12; --panel:#121214; --muted:#9aa0a6; --accent:#f4c542; --text:#e9eef2;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    body{ margin:0; min-height:100vh; background:linear-gradient(180deg,#060507,#121218); color:var(--text);} 
+    header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(0,0,0,0.22);border-bottom:1px solid rgba(255,255,255,0.02)}
+    .brand{font-weight:700;letter-spacing:.06em;color:var(--accent);display:flex;gap:12px;align-items:center}
+    .controls{display:flex;gap:8px;align-items:center}
+    button,input,select{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:6px;color:var(--text)}
+    button.active{border-color:var(--accent);box-shadow:0 6px 30px rgba(244,197,66,0.08); color:var(--accent)}
+    .grid{display:grid;grid-template-columns:300px 1fr 320px;gap:12px;padding:12px;height:calc(100vh - 68px)}
+    @media (max-width:1000px){ .grid{grid-template-columns:1fr; height:auto} }
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:8px;padding:10px;display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+    .card-header{font-weight:700;margin-bottom:8px;color:var(--accent);display:flex;justify-content:space-between;align-items:center}
+    .sessions-list{display:flex;flex-direction:column;gap:8px;overflow:auto}
+    .session-item{padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.02);cursor:pointer}
+    .session-item:hover{background:rgba(255,255,255,0.01)}
+    .term-wrap{height:100%;display:flex;flex-direction:column}
+    #stream-box{flex:1;border-radius:6px;overflow:hidden;background:#060606;padding:8px;display:flex;flex-direction:column}
+    .prompt-bar{display:flex;gap:8px;margin-top:8px}
+    .tiny{font-size:11px;color:var(--muted)}
+    .device-panel{display:flex;gap:8px;flex-wrap:wrap}
+    .device{width:120px;height:80px;border-radius:6px;background:#050505;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px}
+    .scry{width:120px;height:120px;border-radius:50%;border:2px solid rgba(244,197,66,0.12);display:flex;align-items:center;justify-content:center;color:var(--muted);margin:12px auto}
+    .badge{padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.03);font-size:12px;color:var(--muted)}
+    .footer{padding:8px;color:var(--muted);font-size:12px;text-align:center}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div>⚔️ STANK // CLOUDROOM MOCK</div>
+      <div class="badge">TERMUX • CROSTINI</div>
+    </div>
+    <div class="controls">
+      <input id="token-input" placeholder="CLOUDROOM_TOKEN (simulated)" style="width:220px" />
+      <button id="link-btn" onclick="linkCore()">Link Core</button>
+      <button id="attach-btn" onclick="attachPty()" disabled>Attach PTY</button>
+      <button onclick="toggleTheme()" id="theme-btn">🎃 HALLOWEEN</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-header">Sessions & Whorl</div>
+      <div style="flex:1;overflow:auto">
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <select id="harness" style="flex:1">
+            <option>whorl / hermes</option>
+            <option>claude-code</option>
+            <option>codex</option>
+            <option>pi</option>
+          </select>
+          <button onclick="spawn()">+ Spawn</button>
+        </div>
+        <div class="sessions-list" id="sessions-list">
+          <!-- mocked sessions -->
+        </div>
+        <div class="card-header" style="margin-top:12px">Scry</div>
+        <div class="scry" id="scry">CENTER</div>
+        <div class="tiny" style="text-align:center;margin-top:6px">Drag the mock thumbstick in a real UI</div>
+      </div>
+    </div>
+
+    <div class="card term-wrap">
+      <div class="card-header"><span id="pane-title">Diff Theater / Agent Stream</span>
+        <div>
+          <button class="active">Stream</button>
+          <button id="pty-tab">PTY Shell</button>
+        </div>
+      </div>
+
+      <div id="stream-box" style="height:100%;display:flex;flex-direction:column">
+        <div id="term-container" style="flex:1;min-height:240px;display:flex;flex-direction:column">
+          <div id="static-output" style="padding:10px;color:var(--muted);font-size:13px">
+            Preview STANK: click "Link Core" then "Attach PTY" for a demo terminal. This is a static mock — no server required.
+          </div>
+          <div id="xterm-root" style="flex:1;display:none"></div>
+        </div>
+        <div class="prompt-bar">
+          <input id="prompt" placeholder="Send prompt or PTY input (Enter to send)" style="flex:1" />
+          <button onclick="sendPrompt()">Transmit</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Guard & Telemetry</div>
+      <div style="flex:1;overflow:auto">
+        <div class="tiny">Version: mock-0.1 • commit: sha-stank</div>
+        <div style="margin-top:12px" class="tiny">
+          Devices
+          <div class="device-panel" style="margin-top:8px">
+            <div class="device">Phone (aarch64)</div>
+            <div class="device">Chromebook (x86_64)</div>
+            <div class="device">Laptop (x86_64)</div>
+          </div>
+        </div>
+
+        <div class="card-header" style="margin-top:12px">Easter Eggs & Plugins</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button onclick="toggleEaster('mrs')">MrsHiggins</button>
+          <button onclick="toggleEaster('hotseat')">Hotseat</button>
+          <button onclick="toggleEaster('board')">Boardroom</button>
+        </div>
+        <div style="margin-top:12px" class="tiny">Quick visual mock for promos — use this to take screencaps in different themes and device frames.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">STANK mock — for mockups and conceptual demos only. Built for BleakNarratives LARP.</div>
+
+  <!-- xterm & fit addon -->
+  <script src="https://cdn.jsdelivr.net/npm/xterm@5.0.1/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.7.0/lib/xterm-addon-fit.js"></script>
+
+  <script>
+    // small fake session registry
+    let sessions = [];
+    let chosen = null;
+    let fakePtyToken = null;
+    let term = null;
+    let fitAddon = null;
+    let fakeWs = null;
+    let halloween = false;
+
+    function spawn(){
+      const id = 's-' + Math.random().toString(36).slice(2,10);
+      sessions.unshift({id, harness: document.getElementById('harness').value, state:'active'});
+      renderSessions();
+    }
+    function renderSessions(){
+      const container = document.getElementById('sessions-list');
+      container.innerHTML = '';
+      sessions.forEach(s => {
+        const d = document.createElement('div');
+        d.className = 'session-item';
+        d.innerHTML = `<div style="font-weight:700;color:var(--accent)">${s.id}</div><div class="tiny">${s.harness} · ${s.state}</div>`;
+        d.onclick = () => { selectSession(s.id); };
+        container.appendChild(d);
+      });
+    }
+    function selectSession(id){
+      chosen = id;
+      document.getElementById('static-output').textContent = `Session ${id} selected. Click Attach PTY to demo interactive shell.`;
+    }
+
+    async function linkCore(){
+      // simulate token storage
+      const provided = document.getElementById('token-input').value || 'local-mock-token';
+      localStorage.setItem('cloudroom_token', provided);
+      document.getElementById('link-btn').textContent = 'Linked ✓';
+      document.getElementById('attach-btn').disabled = false;
+      // create a fake session if none yet
+      if(!sessions.length) spawn();
+    }
+
+    async function attachPty(){
+      if(!chosen) { alert('Select or spawn a session first'); return; }
+      // simulate server issuing a short-lived pty token
+      fakePtyToken = 'pty-' + Math.random().toString(36).slice(2,10);
+      document.getElementById('static-output').style.display = 'none';
+      document.getElementById('xterm-root').style.display = 'block';
+      initXterm();
+      startFakeWs();
+    }
+
+    function initXterm(){
+      if(term) return;
+      term = new window.Terminal({cursorBlink:true,cols:80,rows:20});
+      fitAddon = new window.FitAddon.FitAddon();
+      term.loadAddon(fitAddon);
+      const root = document.getElementById('xterm-root');
+      root.innerHTML = '';
+      term.open(root);
+      fitAddon.fit();
+      window.addEventListener('resize', ()=>fitAddon.fit());
+      term.writeln('\x1b[1;33mWelcome to STANK mock terminal\x1b[0m');
+      term.writeln(`attached session: ${chosen}`);
+      term.writeln('\x1b[2m(this is simulated output)\x1b[0m\n');
+      term.onData(d => {
+        // send into fake WS
+        if(fakeWs && fakeWs.send) fakeWs.send({type:'stdin', data:d});
+      });
+    }
+
+    // Simulated "WebSocket" object that echoes and streams fake agent output
+    function startFakeWs(){
+      fakeWs = {
+        send(obj){
+          if(obj && obj.type === 'stdin'){
+            // echo back with slight transform
+            setTimeout(()=> {
+              term.write('\r\n\x1b[2;36m»\x1b[0m ' + escapeForTerm(obj.data));
+              term.write('\r\n');
+            }, 80);
+          }
+        },
+        close(){ /* noop */ }
+      };
+
+      // stream "agent" messages periodically (simulate PTY stdout)
+      let i=0;
+      const lines = [
+        "Booting agent sandbox...",
+        "Loading harness: " + document.getElementById('harness').value,
+        "Mounting workspace... (simulated)",
+        "Running quick scout analysis...",
+        "Found 3 potentials, dispatching scout 002...",
+        "Streaming diffs: + file added /docs/notes.md",
+        "Tail: no errors",
+        "Interactive shell ready. Type to echo."
+      ];
+      const interval = setInterval(()=>{
+        if(!term) { clearInterval(interval); return; }
+        const line = lines[i % lines.length];
+        term.writeln(line);
+        i++;
+        if(i>80) clearInterval(interval);
+      }, 900);
+    }
+
+    function escapeForTerm(s){
+      // replace newlines for visual tidy echo
+      return s.replace(/\r?\n/g,'↵');
+    }
+
+    function sendPrompt(){
+      const v = document.getElementById('prompt').value;
+      if(!v) return;
+      document.getElementById('prompt').value = '';
+      if(fakeWs && fakeWs.send) fakeWs.send({type:'stdin', data:v + '\n'});
+      // also simulate agent reply
+      setTimeout(()=>{ if(term) term.writeln('\x1b[1;32mAgent:\x1b[0m ' + v.split(' ').slice(0,8).join(' ') + ' ... (simulated)'); }, 300);
+    }
+
+    function toggleTheme(){
+      halloween = !halloween;
+      if(halloween){
+        document.body.style.background = 'linear-gradient(180deg,#2b0000,#0a0000)'; document.documentElement.style.setProperty('--accent','#ff6b6b');
+        document.getElementById('theme-btn').textContent = '🕸️ HALLOWEEN';
+      } else {
+        document.body.style.background = 'linear-gradient(180deg,#060507,#121218)'; document.documentElement.style.setProperty('--accent','#f4c542');
+        document.getElementById('theme-btn').textContent = '🎃 HALLOWEEN';
+      }
+    }
+
+    // Easter eggs
+    function toggleEaster(which){
+      if(which==='mrs'){ alert("MrsHiggins activated: gentle assistant mode ON"); }
+      if(which==='hotseat'){ alert("Hotseat enabled: round-robin demo mode"); }
+      if(which==='board'){ alert("Boardroom plugin: present 3 speaker slots (mock)"); }
+    }
+
+    // pre-populate sessions
+    (function(){ for(let i=0;i<3;i++) spawn(); renderSessions(); })();
+
+    // keyboard Enter -> prompt input
+    document.getElementById('prompt').addEventListener('keydown', (e)=>{ if(e.key==='Enter') sendPrompt(); });
+  </script>
+</body>
+</html>
