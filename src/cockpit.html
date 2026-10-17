@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>CLOUDROOM // SCRYING COCKPIT & DIFF THEATER</title>
+<style>
+  :root {
+    --bg: #0e0c09;
+    --panel: #16130f;
+    --border: #332b22;
+    --text: #f3ead8;
+    --muted: #9e9078;
+    --gold: #d4a853;
+    --crimson: #c93b2b;
+    --teal: #3aa69b;
+    --glow: rgba(212, 168, 83, 0.22);
+    --font: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  }
+  body.blegh {
+    --bg: #070203;
+    --panel: #140507;
+    --border: #5c1018;
+    --text: #ffe5e5;
+    --muted: #b86b73;
+    --gold: #ff2a4b;
+    --crimson: #ff002b;
+    --teal: #ff6a00;
+    --glow: rgba(255, 0, 43, 0.38);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.2s, color 0.2s;
+  }
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 16px var(--glow);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+  }
+  .badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border: 1px solid var(--gold);
+    border-radius: 3px;
+    color: var(--text);
+    background: rgba(212,168,83,0.12);
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+  button, input, select {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-family: var(--font);
+    font-size: 12px;
+  }
+  button {
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  button:hover, button.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 0 8px var(--glow);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 290px 1fr 330px;
+    gap: 10px;
+    padding: 10px;
+    height: calc(100vh - 56px);
+  }
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: 1fr;
+      height: auto;
+    }
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    color: var(--gold);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .card-body {
+    padding: 10px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.06);
+  }
+  .scrying-ring {
+    width: 150px;
+    height: 150px;
+    margin: 10px auto;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    position: relative;
+    box-shadow: inset 0 0 24px var(--glow), 0 0 18px var(--glow);
+    touch-action: none;
+    user-select: none;
+  }
+  .scrying-pip {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--gold);
+    position: absolute;
+    top: 64px;
+    left: 64px;
+    box-shadow: 0 0 12px var(--gold);
+    pointer-events: none;
+  }
+  .scrying-label {
+    position: absolute;
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .scrying-label.n { top: 4px; left: 50%; transform: translateX(-50%); }
+  .scrying-label.s { bottom: 4px; left: 50%; transform: translateX(-50%); }
+  .scrying-label.w { left: 6px; top: 50%; transform: translateY(-50%); }
+  .scrying-label.e { right: 6px; top: 50%; transform: translateY(-50%); }
+  .stream-box {
+    background: #060504;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 240px;
+  }
+  .prompt-bar {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .prompt-bar input {
+    flex: 1;
+  }
+  .session-item {
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 6px;
+    cursor: pointer;
+  }
+  .session-item.active {
+    border-color: var(--gold);
+    background: rgba(212, 168, 83, 0.08);
+  }
+  .diff-add { color: #5fd787; }
+  .diff-del { color: #ff5f5f; }
+  .kersplode {
+    animation: shake 0.25s ease-in-out;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-4px, 2px) skewX(-2deg); }
+    75% { transform: translate(4px, -2px) skewX(2deg); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span>⚔️ CLOUDROOM // SCRYING COCKPIT</span>
+    <span class="badge" id="host-badge">TERMUX + CROSTINI READY</span>
+    <span class="badge" id="health-badge">CONNECTING...</span>
+  </div>
+  <div class="controls">
+    <input id="token-input" type="password" placeholder="Bearer Token (CLOUDROOM_TOKEN)" style="width:190px" />
+    <button onclick="saveToken()">Link Core</button>
+    <button id="mode-btn" onclick="toggleBlegh()">☯ ZEN / 🔥 BLEGH</button>
+    <button id="mouth-btn" onclick="toggleMouthTape()">👄 MOUTHTAPE: OFF</button>
+    <button id="gyro-btn" onclick="enableGyro()">🧭 TILT/GYRO</button>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- LEFT RAIL: Sessions + Whorl Substrate + Scrying Thumbstick -->
+  <div class="card">
+    <div class="card-header">
+      <span>1. Sessions & Whorl Substrate</span>
+      <button onclick="refreshAll()">↻</button>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;gap:4px;margin-bottom:8px;">
+        <select id="harness-select" style="flex:1">
+          <option value="hermes">whorl / hermes (ACP)</option>
+          <option value="claude-code">claude-code</option>
+          <option value="codex">codex</option>
+          <option value="pi">pi</option>
+          <option value="opencode">opencode</option>
+          <option value="fx">fx</option>
+        </select>
+        <button onclick="spawnSession()">+ Spawn</button>
+      </div>
+      <div id="sessions-list"></div>
+
+      <div class="card-header" style="margin:10px -10px 8px;border-top:1px solid var(--border);">
+        <span>🔮 Scrying Ring / Thumbstick</span>
+        <span id="scry-sector">CENTER</span>
+      </div>
+      <div class="scrying-ring" id="scrying-ring">
+        <span class="scrying-label n">STREAM</span>
+        <span class="scrying-label s">TERMINAL</span>
+        <span class="scrying-label w">PREV</span>
+        <span class="scrying-label e">NEXT</span>
+        <div class="scrying-pip" id="scrying-pip"></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);text-align:center;">
+        Drag thumbstick or tilt device to scry sessions & panes
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER: Agent Event Stream / Diff Theater / Live PTY -->
+  <div class="card" id="center-card">
+    <div class="card-header">
+      <span id="pane-title">2. Diff Theater & Agent Stream</span>
+      <div>
+        <button onclick="setPane('stream')" id="btn-stream" class="active">Stream</button>
+        <button onclick="setPane('terminal')" id="btn-terminal">PTY Shell</button>
+      </div>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;">
+      <div class=" stream-box" id="stream-box">Select or spawn a session, or use Fleet Quick-Dispatch below.</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+        <button onclick="quickPrompt('/fleet')">⚔️ Fleet Map</button>
+        <button onclick="quickPrompt('/scouts list')">🦅 40 Scouts</button>
+        <button onclick="quickPrompt('/scouts report')">📈 Scout Portfolio</button>
+        <button onclick="quickPrompt('/lookingglass ship cloudroom termux + crostini')">🪞 Lookingglass</button>
+        <button onclick="quickPrompt('/zeroclaw')">🦀 ZeroClaw</button>
+        <button onclick="quickPrompt('Convene Vertical AI Boardroom + Constraint Arbitrageur on current workspace')">🏛️ Boardroom / AskHole</button>
+        <button onclick="quickPrompt('Run Whorl Scout -> Oracle -> Governor audit')">🌀 Whorl / MOLT</button>
+        <button onclick="quickPrompt('Dispatch Thoth + Merkaba + Akasha + Kindred + MikeySwarm')">👁️ Thoth / Merkaba / Akasha</button>
+        <button onclick="quickPrompt('/grimoire')" title="Hidden Grimoire & JaneBox Sanctum">🕯️ .grimoire</button>
+      </div>
+      <div class="prompt-bar">
+        <input id="prompt-input" placeholder="Send prompt to agent or command to PTY..." onkeydown="if(event.key==='Enter')sendAction()" />
+        <button onclick="sendAction()">Transmit ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT RAIL: Storage Guard, Capabilities & Lookingglass Telemetry -->
+  <div class="card">
+    <div class="card-header">
+      <span>3. Guard & Host Telemetry</span>
+      <span id="storage-level">NORMAL</span>
+    </div>
+    <div class="card-body">
+      <div id="telemetry-stats"></div>
+      <div class="card-header" style="margin:12px -10px 8px;border-top:1px solid var(--border);">
+        <span>🪞 Lookingglass / Capabilities</span>
+      </div>
+      <div id="caps-list" style="font-size:11px;color:var(--muted);line-height:1.5;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+if (params.get('token')) {
+  localStorage.setItem('cloudroom_token', params.get('token'));
+  history.replaceState({}, '', location.pathname);
+}
+document.getElementById('token-input').value = localStorage.getItem('cloudroom_token') || '';
+
+let currentSession = null;
+let currentPane = 'stream';
+let mouthTape = false;
+let blegh = false;
+let audioCtx = null;
+
+function token() {
+  return document.getElementById('token-input').value.trim();
+}
+function saveToken() {
+  localStorage.setItem('cloudroom_token', token());
+  refreshAll();
+}
+async function api(path, opts = {}) {
+  const headers = Object.assign({ 'Authorization': 'Bearer ' + token() }, opts.headers || {});
+  if (opts.body && typeof opts.body === 'object') {
+    headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(opts.body);
+  }
+  const res = await fetch(path, Object.assign({}, opts, { headers }));
+  const text = await res.text();
+  let data = null;
+  try { data = JSON.parse(text); } catch (_) { data = { raw: text }; }
+  if (!res.ok) throw new Error((data && (data.message || data.error)) || res.statusText);
+  return data;
+}
+
+function thallHit(freq = 42) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = blegh ? 'sawtooth' : 'sine';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.28);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.29);
+  } catch (_) {}
+}
+
+function mouthSpeak(text) {
+  if (!mouthTape || !text) return;
+  thallHit(blegh ? 55 : 140);
+  if ('speechSynthesis' in window) {
+    const u = new SpeechSynthesisUtterance(String(text).slice(0, 220));
+    u.pitch = blegh ? 0.4 : 0.9;
+    u.rate = 1.15;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+function toggleBlegh() {
+  blegh = !blegh;
+  document.body.classList.toggle('blegh', blegh);
+  document.getElementById('center-card').classList.add('kersplode');
+  setTimeout(() => document.getElementById('center-card').classList.remove('kersplode'), 300);
+  thallHit(blegh ? 42 : 110);
+}
+
+function toggleMouthTape() {
+  mouthTape = !mouthTape;
+  const btn = document.getElementById('mouth-btn');
+  btn.textContent = '👄 MOUTHTAPE: ' + (mouthTape ? 'ON' : 'OFF');
+  btn.classList.toggle('active', mouthTape);
+  if (mouthTape) mouthSpeak('MouthTape formant synthesizer online.');
+}
+
+function setPane(p) {
+  currentPane = p;
+  document.getElementById('btn-stream').classList.toggle('active', p === 'stream');
+  document.getElementById('btn-terminal').classList.toggle('active', p === 'terminal');
+  document.getElementById('pane-title').textContent = p === 'stream'
+    ? '2. Diff Theater & Agent Stream'
+    : '2. Interactive Session Stream';
+}
+
+async function refreshAll() {
+  try {
+    const [ready, caps, dash, sessions] = await Promise.all([
+      api('/v1/ready'),
+      api('/v1/capabilities'),
+      api('/v1/dashboard').catch(() => ({})),
+      api('/v1/sessions').catch(() => ({ sessions: [] }))
+    ]);
+    const hb = document.getElementById('health-badge');
+    hb.textContent = ready.ready ? 'CORE READY' : ('DEGRADED: ' + (ready.reason || 'check'));
+    hb.style.borderColor = ready.ready ? '#5fd787' : '#ff5f5f';
+
+    const st = ready.storage || {};
+    document.getElementById('storage-level').textContent = (st.level || 'normal').toUpperCase();
+    const availMb = st.workspace_available_bytes ? Math.round(st.workspace_available_bytes / 1048576) + ' MB' : 'n/a';
+    const totalMb = st.workspace_total_bytes ? Math.round(st.workspace_total_bytes / 1048576) + ' MB' : 'n/a';
+    const harnesses = Object.keys(ready.harnesses || {}).join(', ') || 'none configured';
+    document.getElementById('telemetry-stats').innerHTML = `
+      <div class="stat-row"><span>Version</span><span>${caps.version || ''} (${caps.commit || ''})</span></div>
+      <div class="stat-row"><span>Disk Free</span><span>${availMb} / ${totalMb}</span></div>
+      <div class="stat-row"><span>Guard Reason</span><span>${st.reason || 'ok'}</span></div>
+      <div class="stat-row"><span>Harnesses</span><span>${harnesses}</span></div>
+      <div class="stat-row"><span>Active Sessions</span><span>${(sessions.sessions || []).length}</span></div>
+    `;
+    document.getElementById('caps-list').textContent = (caps.features || []).join(' · ');
+
+    const list = sessions.sessions || [];
+    const container = document.getElementById('sessions-list');
+    container.innerHTML = list.length ? '' : '<div style="color:var(--muted);font-size:11px;">No sessions yet. Click + Spawn above.</div>';
+    list.forEach((s) => {
+      const div = document.createElement('div');
+      div.className = 'session-item' + (currentSession === s.id ? ' active' : '');
+      div.innerHTML = `<div style="font-weight:700;color:var(--gold)">${s.id.slice(0, 12)}</div>
+        <div style="font-size:11px;color:var(--muted)">${s.harness || ''} · ${s.state || s.status || 'active'}</div>`;
+      div.onclick = () => selectSession(s.id);
+      container.appendChild(div);
+    });
+  } catch (err) {
+    document.getElementById('health-badge').textContent = 'AUTH / LINK NEEDED';
+    document.getElementById('stream-box').textContent = 'Link your CLOUDROOM_TOKEN above.\nError: ' + err.message;
+  }
+}
+
+async function selectSession(id) {
+  currentSession = id;
+  refreshAll();
+  try {
+    const ev = await api(`/v1/sessions/${id}/events`);
+    const lines = (ev.events || []).map(e => `[${e.kind || e.type || 'event'}] ${JSON.stringify(e.data || e)}`).join('\n');
+    document.getElementById('stream-box').textContent = lines || `Session ${id} attached. Ready for prompts.`;
+  } catch (err) {
+    document.getElementById('stream-box').textContent = `Session ${id}: ${err.message}`;
+  }
+}
+
+async function spawnSession() {
+  const harness = document.getElementById('harness-select').value;
+  const reqId = 'req-' + Date.now();
+  try {
+    const res = await api('/v1/sessions', {
+      method: 'POST',
+      body: { request_id: reqId, harness }
+    });
+    thallHit(88);
+    currentSession = res.session_id || res.id;
+    await refreshAll();
+    if (currentSession) selectSession(currentSession);
+  } catch (err) {
+    document.getElementById('stream-box').textContent = 'Spawn error: ' + err.message;
+  }
+}
+
+function quickPrompt(text) {
+  document.getElementById('prompt-input').value = text;
+  sendAction();
+}
+
+async function sendAction() {
+  const input = document.getElementById('prompt-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  if (!currentSession) {
+    document.getElementById('stream-box').textContent = 'Spawn or select a session first.';
+    return;
+  }
+  try {
+    const reqId = 'prompt-' + Date.now();
+    await api(`/v1/sessions/${currentSession}/prompts`, {
+      method: 'POST',
+      body: { request_id: reqId, text }
+    });
+    mouthSpeak('Transmitted: ' + text);
+    setTimeout(() => selectSession(currentSession), 600);
+  } catch (err) {
+    document.getElementById('stream-box').textContent += '\n[Error] ' + err.message;
+  }
+}
+
+// Scrying Ring / Thumbstick + Gyro Tilt
+const ring = document.getElementById('scrying-ring');
+const pip = document.getElementById('scrying-pip');
+let dragging = false;
+function updatePip(dx, dy) {
+  const max = 56;
+  const dist = Math.hypot(dx, dy);
+  if (dist > max) { dx = (dx / dist) * max; dy = (dy / dist) * max; }
+  pip.style.left = (64 + dx) + 'px';
+  pip.style.top = (64 + dy) + 'px';
+  let sector = 'CENTER';
+  if (Math.hypot(dx, dy) > 22) {
+    if (Math.abs(dx) > Math.abs(dy)) sector = dx > 0 ? 'NEXT' : 'PREV';
+    else sector = dy > 0 ? 'TERMINAL' : 'STREAM';
+  }
+  document.getElementById('scry-sector').textContent = sector;
+  if (sector === 'STREAM') setPane('stream');
+  if (sector === 'TERMINAL') setPane('terminal');
+}
+ring.addEventListener('pointerdown', (e) => { dragging = true; ring.setPointerCapture(e.pointerId); });
+ring.addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  const r = ring.getBoundingClientRect();
+  updatePip(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+});
+ring.addEventListener('pointerup', () => { dragging = false; updatePip(0, 0); });
+
+function enableGyro() {
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    DeviceOrientationEvent.requestPermission().then(state => {
+      if (state === 'granted') attachGyro();
+    });
+  } else {
+    attachGyro();
+  }
+}
+function attachGyro() {
+  document.getElementById('gyro-btn').classList.add('active');
+  window.addEventListener('deviceorientation', (e) => {
+    const dx = Math.max(-56, Math.min(56, (e.gamma || 0) * 1.8));
+    const dy = Math.max(-56, Math.min(56, ((e.beta || 0) - 35) * 1.8));
+    updatePip(dx, dy);
+  });
+}
+
+refreshAll();
+setInterval(refreshAll, 5000);
+</script>
+</body>
+</html>

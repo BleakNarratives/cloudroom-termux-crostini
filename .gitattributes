@@ -1,0 +1,2 @@
+# Keep end-to-end test scripts out of GitHub language stats.
+tests/** linguist-detectable=false
