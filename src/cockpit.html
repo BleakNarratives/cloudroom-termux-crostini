@@ -3,32 +3,43 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>CLOUDROOM // SCRYING COCKPIT & DIFF THEATER</title>
+<title>CLOUDROOM // SCRYING COCKPIT & DIFF THEATER V2</title>
 <style>
   :root {
-    --bg: #0e0c09;
-    --panel: #16130f;
-    --border: #332b22;
-    --text: #f3ead8;
-    --muted: #9e9078;
-    --gold: #d4a853;
-    --crimson: #c93b2b;
-    --teal: #3aa69b;
-    --glow: rgba(212, 168, 83, 0.22);
+    --bg: #090806;
+    --panel: #13100c;
+    --card-bg: rgba(23, 19, 14, 0.75);
+    --border: rgba(212, 168, 83, 0.25);
+    --border-glow: rgba(212, 168, 83, 0.4);
+    --text: #f7f1e5;
+    --muted: #a3957d;
+    --gold: #e5b85c;
+    --gold-glow: #ffcf70;
+    --crimson: #d94333;
+    --teal: #42bebd;
+    --purple: #a855f7;
+    --glow: rgba(229, 184, 92, 0.22);
     --font: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+    --glass-blur: blur(12px);
   }
   body.blegh {
-    --bg: #070203;
-    --panel: #140507;
-    --border: #5c1018;
-    --text: #ffe5e5;
-    --muted: #b86b73;
+    --bg: #060102;
+    --panel: #120305;
+    --card-bg: rgba(24, 4, 8, 0.82);
+    --border: rgba(255, 42, 75, 0.35);
+    --border-glow: rgba(255, 42, 75, 0.6);
+    --text: #ffeef0;
+    --muted: #c27680;
     --gold: #ff2a4b;
+    --gold-glow: #ff5c75;
     --crimson: #ff002b;
     --teal: #ff6a00;
-    --glow: rgba(255, 0, 43, 0.38);
+    --purple: #d946ef;
+    --glow: rgba(255, 0, 43, 0.42);
   }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -36,274 +47,380 @@
     font-size: 13px;
     min-height: 100vh;
     overflow-x: hidden;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.3s ease, color 0.3s ease;
+    background-image:
+      radial-gradient(circle at 15% 15%, rgba(229, 184, 92, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 85% 85%, rgba(66, 190, 189, 0.05) 0%, transparent 40%);
   }
+
   header {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 10px 14px;
-    background: var(--panel);
+    gap: 12px;
+    padding: 12px 20px;
+    background: rgba(19, 16, 12, 0.85);
+    backdrop-filter: var(--glass-blur);
     border-bottom: 1px solid var(--border);
-    box-shadow: 0 2px 16px var(--glow);
+    box-shadow: 0 4px 20px var(--glow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
+
   .brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 1.5px;
     color: var(--gold);
+    text-transform: uppercase;
+    font-size: 14px;
+    text-shadow: 0 0 10px var(--glow);
   }
+  .brand-logo {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, var(--gold), var(--teal));
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-weight: 900;
+    font-size: 12px;
+    box-shadow: 0 0 12px var(--glow);
+  }
+
   .badge {
-    font-size: 10px;
-    padding: 2px 6px;
-    border: 1px solid var(--gold);
-    border-radius: 3px;
-    color: var(--text);
-    background: rgba(212,168,83,0.12);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    background: rgba(0,0,0,0.4);
+    font-weight: 700;
+    letter-spacing: 0.5px;
   }
-  .controls {
+
+  .top-controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
     align-items: center;
+    gap: 10px;
   }
-  button, input, select {
-    background: var(--bg);
-    color: var(--text);
+
+  input[type="password"], input[type="text"] {
+    background: rgba(0,0,0,0.6);
     border: 1px solid var(--border);
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-family: var(--font);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-family: inherit;
     font-size: 12px;
+    outline: none;
+    transition: all 0.2s;
   }
-  button {
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  button:hover, button.active {
+  input[type="password"]:focus, input[type="text"]:focus {
     border-color: var(--gold);
-    color: var(--gold);
     box-shadow: 0 0 8px var(--glow);
   }
-  .grid {
-    display: grid;
-    grid-template-columns: 290px 1fr 330px;
-    gap: 10px;
-    padding: 10px;
-    height: calc(100vh - 56px);
+
+  button {
+    background: rgba(30, 25, 20, 0.8);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
-  @media (max-width: 960px) {
-    .grid {
+  button:hover {
+    background: var(--gold);
+    color: #000;
+    border-color: var(--gold-glow);
+    box-shadow: 0 0 12px var(--glow);
+    transform: translateY(-1px);
+  }
+  button.active {
+    background: var(--gold);
+    color: #000;
+    border-color: var(--gold-glow);
+    box-shadow: 0 0 14px var(--glow);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    gap: 16px;
+    padding: 16px;
+    max-width: 1700px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 1150px) {
+    .layout {
       grid-template-columns: 1fr;
-      height: auto;
     }
   }
+
   .card {
-    background: var(--panel);
+    background: var(--card-bg);
+    backdrop-filter: var(--glass-blur);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
   }
+  .card:hover {
+    border-color: var(--border-glow);
+  }
+
   .card-header {
-    padding: 8px 12px;
+    padding: 12px 16px;
+    background: rgba(0,0,0,0.3);
     border-bottom: 1px solid var(--border);
     font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
     color: var(--gold);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
   }
+
   .card-body {
-    padding: 10px;
-    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     flex: 1;
   }
-  .stat-row {
+
+  /* Scrying Ring Joystick */
+  .scry-wrapper {
     display: flex;
-    justify-content: space-between;
-    padding: 4px 0;
-    border-bottom: 1px dashed rgba(255,255,255,0.06);
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 10px;
+    border: 1px dashed var(--border);
   }
-  .scrying-ring {
-    width: 150px;
-    height: 150px;
-    margin: 10px auto;
+  .scry-ring {
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     border: 2px solid var(--gold);
     position: relative;
-    box-shadow: inset 0 0 24px var(--glow), 0 0 18px var(--glow);
+    background: radial-gradient(circle, rgba(229,184,92,0.1) 0%, rgba(0,0,0,0.6) 80%);
+    box-shadow: inset 0 0 20px var(--glow), 0 0 15px var(--glow);
     touch-action: none;
-    user-select: none;
+    cursor: grab;
   }
-  .scrying-pip {
+  .scry-ring:active { cursor: grabbing; }
+  .scry-pip {
     width: 22px;
     height: 22px;
     border-radius: 50%;
     background: var(--gold);
     position: absolute;
-    top: 64px;
-    left: 64px;
-    box-shadow: 0 0 12px var(--gold);
+    top: 59px;
+    left: 59px;
+    box-shadow: 0 0 12px var(--gold-glow);
     pointer-events: none;
+    transition: transform 0.05s linear;
   }
-  .scrying-label {
-    position: absolute;
-    font-size: 9px;
-    color: var(--muted);
-    text-transform: uppercase;
+
+  .session-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
-  .scrying-label.n { top: 4px; left: 50%; transform: translateX(-50%); }
-  .scrying-label.s { bottom: 4px; left: 50%; transform: translateX(-50%); }
-  .scrying-label.w { left: 6px; top: 50%; transform: translateY(-50%); }
-  .scrying-label.e { right: 6px; top: 50%; transform: translateY(-50%); }
+  .session-item:hover {
+    border-color: var(--border);
+    background: rgba(229, 184, 92, 0.08);
+  }
+  .session-item.active {
+    border-color: var(--gold);
+    background: rgba(229, 184, 92, 0.15);
+    box-shadow: 0 0 12px var(--glow);
+  }
+
+  /* Main Stream & Theater */
   .stream-box {
-    background: #060504;
+    background: #040302;
     border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 10px;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: var(--font);
     font-size: 12px;
-    line-height: 1.45;
-    white-space: pre-wrap;
-    word-break: break-word;
-    flex: 1;
+    line-height: 1.5;
+    color: var(--text);
+    height: 480px;
     overflow-y: auto;
-    min-height: 240px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    box-shadow: inset 0 0 12px rgba(0,0,0,0.8);
   }
+
   .prompt-bar {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     margin-top: 8px;
   }
   .prompt-bar input {
     flex: 1;
   }
-  .session-item {
-    padding: 8px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    margin-bottom: 6px;
-    cursor: pointer;
+
+  .quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
   }
-  .session-item.active {
-    border-color: var(--gold);
-    background: rgba(212, 168, 83, 0.08);
+  .quick-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    background: rgba(255,255,255,0.05);
   }
-  .diff-add { color: #5fd787; }
-  .diff-del { color: #ff5f5f; }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 11px;
+  }
+  .stat-row span:first-child { color: var(--muted); }
+  .stat-row span:last-child { color: var(--gold); font-weight: 600; }
+
   .kersplode {
-    animation: shake 0.25s ease-in-out;
+    animation: kersplodeAnim 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-  @keyframes shake {
-    0%, 100% { transform: translate(0, 0); }
-    25% { transform: translate(-4px, 2px) skewX(-2deg); }
-    75% { transform: translate(4px, -2px) skewX(2deg); }
+  @keyframes kersplodeAnim {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); filter: brightness(1.4); }
+    100% { transform: scale(1); }
   }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 </style>
 </head>
 <body>
+
 <header>
   <div class="brand">
-    <span>⚔️ CLOUDROOM // SCRYING COCKPIT</span>
-    <span class="badge" id="host-badge">TERMUX + CROSTINI READY</span>
-    <span class="badge" id="health-badge">CONNECTING...</span>
+    <div class="brand-logo">CR</div>
+    <span>Cloudroom // Scrying Cockpit & Diff Theater</span>
   </div>
-  <div class="controls">
-    <input id="token-input" type="password" placeholder="Bearer Token (CLOUDROOM_TOKEN)" style="width:190px" />
-    <button onclick="saveToken()">Link Core</button>
-    <button id="mode-btn" onclick="toggleBlegh()">☯ ZEN / 🔥 BLEGH</button>
+  <div class="top-controls">
+    <div id="health-badge" class="badge" style="color: var(--gold);">CONNECTING...</div>
+    <input type="password" id="token-input" placeholder="CLOUDROOM_TOKEN..." onchange="saveToken()" />
+    <button onclick="saveToken()">🔐 Save Link</button>
     <button id="mouth-btn" onclick="toggleMouthTape()">👄 MOUTHTAPE: OFF</button>
-    <button id="gyro-btn" onclick="enableGyro()">🧭 TILT/GYRO</button>
+    <button id="gyro-btn" onclick="enableGyro()">🌀 GYRO TILT</button>
+    <button onclick="toggleBlegh()">🔥 BLEGH MODE</button>
   </div>
 </header>
 
-<div class="grid">
-  <!-- LEFT RAIL: Sessions + Whorl Substrate + Scrying Thumbstick -->
+<div class="layout">
+  <!-- LEFT RAIL: Scrying Ring & Harness Matrix -->
   <div class="card">
     <div class="card-header">
-      <span>1. Sessions & Whorl Substrate</span>
-      <button onclick="refreshAll()">↻</button>
+      <span>1. Scrying Control & Spawn</span>
     </div>
     <div class="card-body">
-      <div style="display:flex;gap:4px;margin-bottom:8px;">
-        <select id="harness-select" style="flex:1">
-          <option value="hermes">whorl / hermes (ACP)</option>
-          <option value="claude-code">claude-code</option>
-          <option value="codex">codex</option>
-          <option value="pi">pi</option>
-          <option value="opencode">opencode</option>
-          <option value="fx">fx</option>
-        </select>
-        <button onclick="spawnSession()">+ Spawn</button>
+      <div class="scry-wrapper">
+        <div class="scry-ring" id="scrying-ring">
+          <div class="scry-pip" id="scrying-pip"></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;">
+          SECTOR: <span id="scry-sector" style="color:var(--gold);font-weight:700;">CENTER</span>
+        </div>
       </div>
-      <div id="sessions-list"></div>
 
-      <div class="card-header" style="margin:10px -10px 8px;border-top:1px solid var(--border);">
-        <span>🔮 Scrying Ring / Thumbstick</span>
-        <span id="scry-sector">CENTER</span>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+        <label style="font-size:11px;color:var(--muted);font-weight:700;">SPAWN HARNESS</label>
+        <div style="display:flex;gap:6px;">
+          <select id="harness-select" style="flex:1;background:rgba(0,0,0,0.5);border:1px solid var(--border);color:var(--text);padding:6px;border-radius:6px;font-family:inherit;">
+            <option value="codex">Codex Harness</option>
+            <option value="claude">Claude Code</option>
+            <option value="pi">Pi Harness</option>
+            <option value="opencode">OpenCode</option>
+          </select>
+          <button onclick="spawnSession()">+ Spawn</button>
+        </div>
       </div>
-      <div class="scrying-ring" id="scrying-ring">
-        <span class="scrying-label n">STREAM</span>
-        <span class="scrying-label s">TERMINAL</span>
-        <span class="scrying-label w">PREV</span>
-        <span class="scrying-label e">NEXT</span>
-        <div class="scrying-pip" id="scrying-pip"></div>
-      </div>
-      <div style="font-size:11px;color:var(--muted);text-align:center;">
-        Drag thumbstick or tilt device to scry sessions & panes
+
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;">ACTIVE AGENT SESSIONS</div>
+        <div id="sessions-list" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;">
+          <!-- Loaded dynamically -->
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- CENTER: Agent Event Stream / Diff Theater / Live PTY -->
+  <!-- CENTER: Diff Theater & Realtime Agent Stream -->
   <div class="card" id="center-card">
     <div class="card-header">
       <span id="pane-title">2. Diff Theater & Agent Stream</span>
-      <div>
-        <button onclick="setPane('stream')" id="btn-stream" class="active">Stream</button>
-        <button onclick="setPane('terminal')" id="btn-terminal">PTY Shell</button>
+      <div style="display:flex;gap:6px;">
+        <button id="btn-stream" class="active" onclick="setPane('stream')">Stream / Diff</button>
+        <button id="btn-terminal" onclick="setPane('terminal')">PTY Terminal</button>
       </div>
     </div>
-    <div class="card-body" style="display:flex;flex-direction:column;">
-      <div class=" stream-box" id="stream-box">Select or spawn a session, or use Fleet Quick-Dispatch below.</div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
-        <button onclick="quickPrompt('/fleet')">⚔️ Fleet Map</button>
-        <button onclick="quickPrompt('/scouts list')">🦅 40 Scouts</button>
-        <button onclick="quickPrompt('/scouts report')">📈 Scout Portfolio</button>
-        <button onclick="quickPrompt('/lookingglass ship cloudroom termux + crostini')">🪞 Lookingglass</button>
-        <button onclick="quickPrompt('/zeroclaw')">🦀 ZeroClaw</button>
-        <button onclick="quickPrompt('Convene Vertical AI Boardroom + Constraint Arbitrageur on current workspace')">🏛️ Boardroom / AskHole</button>
-        <button onclick="quickPrompt('Run Whorl Scout -> Oracle -> Governor audit')">🌀 Whorl / MOLT</button>
-        <button onclick="quickPrompt('Dispatch Thoth + Merkaba + Akasha + Kindred + MikeySwarm')">👁️ Thoth / Merkaba / Akasha</button>
-        <button onclick="quickPrompt('/grimoire')" title="Hidden Grimoire & JaneBox Sanctum">🕯️ .grimoire</button>
+    <div class="card-body">
+      <div class="quick-actions">
+        <button class="quick-btn" onclick="quickPrompt('git status')">⚡ git status</button>
+        <button class="quick-btn" onclick="quickPrompt('git diff')">⚡ git diff</button>
+        <button class="quick-btn" onclick="quickPrompt('cargo check')">⚡ cargo check</button>
+        <button class="quick-btn" onclick="quickPrompt('cargo test')">⚡ cargo test</button>
       </div>
+
+      <div id="stream-box" class="stream-box">Initializing Scrying Cockpit telemetry connection...</div>
+
       <div class="prompt-bar">
-        <input id="prompt-input" placeholder="Send prompt to agent or command to PTY..." onkeydown="if(event.key==='Enter')sendAction()" />
+        <input id="prompt-input" placeholder="Send prompt to active agent session..." onkeydown="if(event.key==='Enter')sendAction()" />
         <button onclick="sendAction()">Transmit ▶</button>
       </div>
     </div>
   </div>
 
-  <!-- RIGHT RAIL: Storage Guard, Capabilities & Lookingglass Telemetry -->
+  <!-- RIGHT RAIL: Storage Guard, Capabilities & Telemetry -->
   <div class="card">
     <div class="card-header">
       <span>3. Guard & Host Telemetry</span>
-      <span id="storage-level">NORMAL</span>
+      <span id="storage-level" class="badge">NORMAL</span>
     </div>
     <div class="card-body">
       <div id="telemetry-stats"></div>
-      <div class="card-header" style="margin:12px -10px 8px;border-top:1px solid var(--border);">
-        <span>🪞 Lookingglass / Capabilities</span>
+      <div class="card-header" style="margin:12px -16px 8px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-radius:0;">
+        <span>🪞 Capabilities Matrix</span>
       </div>
-      <div id="caps-list" style="font-size:11px;color:var(--muted);line-height:1.5;"></div>
+      <div id="caps-list" style="font-size:11px;color:var(--muted);line-height:1.6;"></div>
     </div>
   </div>
 </div>
@@ -374,7 +491,7 @@ function toggleBlegh() {
   blegh = !blegh;
   document.body.classList.toggle('blegh', blegh);
   document.getElementById('center-card').classList.add('kersplode');
-  setTimeout(() => document.getElementById('center-card').classList.remove('kersplode'), 300);
+  setTimeout(() => document.getElementById('center-card').classList.remove('kersplode'), 350);
   thallHit(blegh ? 42 : 110);
 }
 
@@ -405,7 +522,8 @@ async function refreshAll() {
     ]);
     const hb = document.getElementById('health-badge');
     hb.textContent = ready.ready ? 'CORE READY' : ('DEGRADED: ' + (ready.reason || 'check'));
-    hb.style.borderColor = ready.ready ? '#5fd787' : '#ff5f5f';
+    hb.style.borderColor = ready.ready ? '#42bebd' : '#ff5f5f';
+    hb.style.color = ready.ready ? '#42bebd' : '#ff5f5f';
 
     const st = ready.storage || {};
     document.getElementById('storage-level').textContent = (st.level || 'normal').toUpperCase();
@@ -434,6 +552,8 @@ async function refreshAll() {
     });
   } catch (err) {
     document.getElementById('health-badge').textContent = 'AUTH / LINK NEEDED';
+    document.getElementById('health-badge').style.borderColor = '#ff5f5f';
+    document.getElementById('health-badge').style.color = '#ff5f5f';
     document.getElementById('stream-box').textContent = 'Link your CLOUDROOM_TOKEN above.\nError: ' + err.message;
   }
 }
@@ -494,18 +614,18 @@ async function sendAction() {
   }
 }
 
-// Scrying Ring / Thumbstick + Gyro Tilt
+// Scrying Ring / Thumbstick
 const ring = document.getElementById('scrying-ring');
 const pip = document.getElementById('scrying-pip');
 let dragging = false;
 function updatePip(dx, dy) {
-  const max = 56;
+  const max = 48;
   const dist = Math.hypot(dx, dy);
   if (dist > max) { dx = (dx / dist) * max; dy = (dy / dist) * max; }
-  pip.style.left = (64 + dx) + 'px';
-  pip.style.top = (64 + dy) + 'px';
+  pip.style.left = (59 + dx) + 'px';
+  pip.style.top = (59 + dy) + 'px';
   let sector = 'CENTER';
-  if (Math.hypot(dx, dy) > 22) {
+  if (Math.hypot(dx, dy) > 20) {
     if (Math.abs(dx) > Math.abs(dy)) sector = dx > 0 ? 'NEXT' : 'PREV';
     else sector = dy > 0 ? 'TERMINAL' : 'STREAM';
   }
@@ -533,8 +653,8 @@ function enableGyro() {
 function attachGyro() {
   document.getElementById('gyro-btn').classList.add('active');
   window.addEventListener('deviceorientation', (e) => {
-    const dx = Math.max(-56, Math.min(56, (e.gamma || 0) * 1.8));
-    const dy = Math.max(-56, Math.min(56, ((e.beta || 0) - 35) * 1.8));
+    const dx = Math.max(-48, Math.min(48, (e.gamma || 0) * 1.8));
+    const dy = Math.max(-48, Math.min(48, ((e.beta || 0) - 35) * 1.8));
     updatePip(dx, dy);
   });
 }
