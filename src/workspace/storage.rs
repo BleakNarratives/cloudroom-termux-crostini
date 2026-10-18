@@ -141,7 +141,10 @@ impl Policy {
             fs::create_dir_all(config.state_dir.join("tmp"))?;
         }
         self.check_filesystems(config)?;
-        if !self.container() && !self.rootless && fs::metadata(&config.state_dir)?.uid() == self.agent_uid {
+        if !self.container()
+            && !self.rootless
+            && fs::metadata(&config.state_dir)?.uid() == self.agent_uid
+        {
             return Err(io::Error::other(
                 "history must belong to the protected service account",
             ));
