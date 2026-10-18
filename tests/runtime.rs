@@ -241,6 +241,8 @@ async fn workload_cleanup_requires_confirmed_empty_group() {
         cache_dir: dir.0.join("cache"),
         cgroup_root: Some(root.clone()),
         agent_sudo: false,
+        rootless: false,
+        code_dir: None,
         warning_bytes: 5,
         pause_bytes: 2,
         resume_bytes: 3,
