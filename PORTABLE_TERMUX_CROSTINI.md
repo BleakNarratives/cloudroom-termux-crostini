@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+"""
+[DNA_TAG]
+ORIGIN: Moto4
+PILLAR: dynamic_auto_tag
+PATH: PORTABLE_TERMUX_CROSTINI.md
+ROLE: Auto-tagged by Code Sentinel on directory traversal.
+LAST_SYNC: 2026-08-01T19:15:00
+[/DNA_TAG]
+"""
+
 # Cloudroom Core — BleakNarratives Termux (Android) & ChromeOS Crostini Edition
 
 > **First native rootless Cloudroom Core build for Android Termux (`aarch64-linux-android`) & ChromeOS Crostini (`x86_64` / `aarch64`).**  

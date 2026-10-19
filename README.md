@@ -1,6 +1,28 @@
-# Cloudroom core — BleakNarratives Android Termux & ChromeOS Crostini Edition
+#!/usr/bin/env python3
+"""
+[DNA_TAG]
+ORIGIN: Moto4
+PILLAR: dynamic_auto_tag
+PATH: README.md
+ROLE: Auto-tagged by Code Sentinel on directory traversal.
+LAST_SYNC: 2026-08-01T19:15:00
+[/DNA_TAG]
+"""
+
+# Cloudroom Core — BleakNarratives Android Termux & ChromeOS Crostini Edition
 
 > **New in this fork:** [PORTABLE_TERMUX_CROSTINI.md](PORTABLE_TERMUX_CROSTINI.md) — First rootless native build for **Android Termux (`aarch64-linux-android`)** and **ChromeOS Crostini (`x86_64` / `aarch64`)** with zero Ubuntu VM, zero `proot`, zero `systemd`, built-in **Scrying Cockpit & Diff Theater (`/cockpit`)**, **Whorl / MOLT 27-Pillar ACP Substrate (`install/whorl-acp.py`)**, **Vigil + Tribunal + TruthSleuth Gate**, and the hidden **`.grimoire` / `JaneBox`** sanctum (`./install/portable-start.sh`).
+
+## Core Technical Pillars
+
+**B**uilding the substrate with ACP JSON-RPC 2.0.
+**A**utonomous agents managed by rootless Whorl modules.
+**R**ust-native performance for Android Bionic/Crostini.
+**D**iff Theater providing real-time cockpit feedback.
+**I**solated user-space storage via single-user guard.
+**L**ow-RAM linker profiles for stable OOM-free execution.
+**D**ecentralized history tracking, locally encrypted.
+**O**rchestrated Vigil/Tribunal/TruthSleuth Anti-Hallucination Gate.
 
 [Website](https://www.cloudroom.dev) · [Desktop app](https://github.com/davidondrej/cloudroom-gui) · [Changelog](https://www.cloudroom.dev/changelog) · [Security](https://www.cloudroom.dev/security)
 
